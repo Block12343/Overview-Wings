@@ -116,11 +116,11 @@ python3 -m venv wings | tee -a $LOG_PATH
 source wings/bin/activate
 
 pip install --upgrade pip | tee -a $LOG_PATH
-pip install -r $INSTALL_PATH/requirements.txt | tee -a $LOG_PATH
+pip install -r /var/www/Overview/wings/$INSTALL_PATH/py_requirements.txt | tee -a $LOG_PATH
 
 echo "Virtual environment setup complete." | tee -a $LOG_PATH
 
-deactivate | tee -a $LOG_PATH # leaves venv environment, returns to normal shell
+deactivate # leaves venv environment, returns to normal shell
 
 # setup web server
 

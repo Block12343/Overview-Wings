@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=block
 WorkingDirectory=/path/to/your/project
-ExecStart=/path/to/your/project/venv/bin/python /path/to/your/project/your_script.py
+ExecStart=/var/www/Overview/wings/venv/bin/python /var/www/Overview/wings/main.py
 Restart=on-failure
 
 [Install]
