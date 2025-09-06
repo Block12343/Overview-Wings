@@ -11,6 +11,8 @@ HTTP_ENGINE=''
 
 LOG_PATH='/var/log/overview_wings_install.log'
 
+INSTALL_PATH='.install'
+
 # check for curl
 if ! command -v curl &> /dev/null
 then
@@ -32,6 +34,13 @@ then
     echo "python3 could not be found, please install python3 and try again." | tee -a $LOG_PATH
     exit 1
 fi  
+
+#check for venv
+if ! python3 -m venv --help &> /dev/null
+then
+    echo "python3-venv could not be found, please install python3-venv and try again." | tee -a $LOG_PATH
+    exit 1
+fi
 
 # check for nginx
 if [ command -v nginx &> /dev/null ] && [ command -v apache2 &> /dev/null ]; then
@@ -94,4 +103,28 @@ cp -r * /var/www/Overview/wings
 
 rm -rf /var/tmp/"$GITHUB_REPO"
 
-# now config stuff
+# now python env setup
+echo "Setting up virtual environment..." | tee -a $LOG_PATH
+cd /var/www/Overview/wings
+
+python3 -m venv wings | tee -a $LOG_PATH
+source wings/bin/activate | tee -a $LOG_PATH
+
+pip install --upgrade pip | tee -a $LOG_PATH
+pip install -r $INSTALL_PATH/requirements.txt | tee -a $LOG_PATH
+
+echo "Virtual environment setup complete." | tee -a $LOG_PATH
+
+deactivate | tee -a $LOG_PATH # leaves venv environment, returns to normal shell
+
+# setup web server
+
+# setup systemd service
+echo "Setting up systemd service..." | tee -a $LOG_PATH
+
+sudo cp $INSTALL_PATH/overview-wings.service /etc/systemd/system/overview-wings.service | tee -a $LOG_PATH
+sudo systemctl daemon-reload | tee -a $LOG_PATH
+sudo systemctl enable overview-wings | tee -a $LOG_PATH
+
+echo "Systemd service setup complete." | tee -a $LOG_PATH
+echo "You can start the service with 'sudo systemctl start overview-wings'" | tee -a $LOG_PATH

@@ -1,0 +1,13 @@
+[Unit]
+Description=Overview Wings Service
+After=network.target
+
+[Service]
+Type=simple
+User=block
+WorkingDirectory=/path/to/your/project
+ExecStart=/path/to/your/project/venv/bin/python /path/to/your/project/your_script.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -1,4 +1,6 @@
 import flask
 
 
-def createApp()
+def createApp():
+    app = flask.Flask(__name__)
+    return app
