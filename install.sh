@@ -11,7 +11,7 @@ HTTP_ENGINE=''
 
 LOG_PATH='/var/log/overview_wings_install.log'
 
-INSTALL_PATH='.install'
+INSTALL_PATH='install'
 
 # check for curl
 if ! command -v curl &> /dev/null
@@ -48,11 +48,11 @@ if [ command -v nginx &> /dev/null ] && [ command -v apache2 &> /dev/null ]; the
     exit 1
 elif command -v apache2 &> /dev/null; then
     echo "Using apache2..." | tee -a $LOG_PATH
-    $HTTP_ENGINE='apache2'
+    HTTP_ENGINE='apache2'
 elif command -v nginx &> /dev/null;
 then
     echo "Using nginx..." | tee -a $LOG_PATH
-    $HTTP_ENGINE='nginx'
+    HTTP_ENGINE='nginx'
 else
     echo "Neither nginx nor apache2 could be found, nginx is being installed." | tee -a $LOG_PATH
     echo "Do you wish to continue? (y/n)" | tee -a $LOG_PATH
@@ -62,14 +62,19 @@ else
         if command -v apt-get &> /dev/null; then
             sudo apt-get update | tee -a $LOG_PATH
             sudo apt-get install -y nginx | tee -a $LOG_PATH
-            $HTTP_ENGINE='nginx'
+            HTTP_ENGINE='nginx'
         elif command -v yum &> /dev/null; then
             sudo yum install -y epel-release | tee -a $LOG_PATH
             sudo yum install -y nginx | tee -a $LOG_PATH    
-            $HTTP_ENGINE='nginx'
+            HTTP_ENGINE='nginx'
         else
             echo "Neither apt-get nor yum could be found, please install nginx manually and try again." | tee -a $LOG_PATH
             exit 1
+        fi
+    else
+        echo "Aborting installation." | tee -a $LOG_PATH
+        exit 0
+    fi
 fi
 
 
@@ -108,7 +113,7 @@ echo "Setting up virtual environment..." | tee -a $LOG_PATH
 cd /var/www/Overview/wings
 
 python3 -m venv wings | tee -a $LOG_PATH
-source wings/bin/activate | tee -a $LOG_PATH
+source wings/bin/activate
 
 pip install --upgrade pip | tee -a $LOG_PATH
 pip install -r $INSTALL_PATH/requirements.txt | tee -a $LOG_PATH
@@ -128,3 +133,6 @@ sudo systemctl enable overview-wings | tee -a $LOG_PATH
 
 echo "Systemd service setup complete." | tee -a $LOG_PATH
 echo "You can start the service with 'sudo systemctl start overview-wings'" | tee -a $LOG_PATH
+
+
+#delete install files
